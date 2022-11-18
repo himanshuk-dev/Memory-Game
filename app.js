@@ -1,4 +1,9 @@
 const gameContainer = document.getElementById("game");
+const clickCount = document.querySelector("#clicks");
+let clicks = 1;
+let count = 0;
+let firstCard = null;
+let secondCard = null;
 
 const COLORS = [
   "red",
@@ -9,6 +14,8 @@ const COLORS = [
   "red",
   "blue",
   "green",
+  "orange",
+  "purple",
   "orange",
   "purple",
 ];
@@ -52,6 +59,8 @@ function createDivsForColors(colorArray) {
     // call a function handleCardClick when a div is clicked on
     newDiv.addEventListener("click", handleCardClick);
 
+    // Add background image for each div
+    // newDiv.style.backgroundImage = 'url("images/smiley.jpeg")';
     // append the div to the element with an id of game
     gameContainer.append(newDiv);
   }
@@ -61,8 +70,62 @@ function createDivsForColors(colorArray) {
 function handleCardClick(event) {
   // you can use event.target to see which element was clicked
   console.log("you just clicked", event.target);
-}
+  if (event.target.classList.contains("active")) return;
+  let activeCard = event.target;
+  // Count number of clicks
 
+  count += 1;
+  console.log("click count", count);
+  if (count > 2) {
+    () => {
+      activeCard.removeEventlistener("click", handleCardClick);
+      activeCard.style.backgroundColor = "";
+      firstCard = null;
+      secondCard = null;
+    };
+  } else {
+    activeCard.style.backgroundColor = activeCard.attributes.class.value;
+    clickCount.innerHTML = clicks;
+    clicks += 1;
+  }
+
+  if (!firstCard || !secondCard) {
+    activeCard.classList.add("active");
+    firstCard = firstCard || activeCard;
+    secondCard = activeCard === firstCard ? null : activeCard;
+  }
+  console.log("firstcard", firstCard);
+  console.log("secondcard", secondCard);
+
+  if (firstCard && secondCard) {
+    let firstClass = firstCard.className;
+    let secondClass = secondCard.className;
+
+    if (firstClass === secondClass) {
+      firstCard.removeEventListener("click", handleCardClick);
+      secondCard.removeEventListener("click", handleCardClick);
+      firstCard = null;
+      secondCard = null;
+      count = 0;
+    } else {
+      count = 0;
+      setTimeout(function () {
+        firstCard.style.backgroundColor = "";
+        secondCard.style.backgroundColor = "";
+        firstCard.classList.remove("active");
+        secondCard.classList.remove("active");
+        firstCard = null;
+        secondCard = null;
+      }, 1000);
+    }
+  }
+
+  setTimeout(function () {
+    // event.target.classList.remove("flip-img");
+  }, 1000);
+
+  console.log("card flipped", event);
+}
 // when the DOM loads
 createDivsForColors(shuffledColors);
 
